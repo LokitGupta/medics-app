@@ -3,6 +3,7 @@
 <uses-permission android:name="android.permission.CAMERA" />
 <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <application
+        android:enableOnBackInvokedCallback="true"
         android:label="medics_app"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

@@ -141,7 +141,7 @@ class _HomeTab extends ConsumerWidget {
               child: _QuickActionCard(
                 icon: Icons.search,
                 title: 'Find Doctor',
-                onTap: () => context.push('/doctors'),
+                onTap: () => context.push('/home/doctors'),
               ),
             ),
             const SizedBox(width: 16),
@@ -149,7 +149,7 @@ class _HomeTab extends ConsumerWidget {
               child: _QuickActionCard(
                 icon: Icons.calendar_today,
                 title: 'My Appointments',
-                onTap: () => context.push('/appointments'),
+                onTap: () => context.push('/home/appointments'),
               ),
             ),
           ],
@@ -161,7 +161,7 @@ class _HomeTab extends ConsumerWidget {
               child: _QuickActionCard(
                 icon: Icons.article,
                 title: 'Health Articles',
-                onTap: () => context.push('/articles'),
+                onTap: () => context.push('/home/articles'),
               ),
             ),
             const SizedBox(width: 16),
@@ -199,7 +199,7 @@ class _HomeTab extends ConsumerWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             TextButton(
-              onPressed: () => context.push('/doctors'),
+              onPressed: () => context.push('/home/doctors'),
               child: const Text('See All'),
             ),
           ],
@@ -217,7 +217,7 @@ class _HomeTab extends ConsumerWidget {
                   return _DoctorCard(
                     doctor: topDoctors[index],
                     onTap: () => context.push(
-                      '/doctor-detail',
+                      '/home/doctor-detail',
                       extra: topDoctors[index],
                     ),
                   );
@@ -247,7 +247,7 @@ class _HomeTab extends ConsumerWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             TextButton(
-              onPressed: () => context.push('/articles'),
+              onPressed: () => context.push('/home/articles'),
               child: const Text('See All'),
             ),
           ],
@@ -260,7 +260,8 @@ class _HomeTab extends ConsumerWidget {
               children: recentArticles.map((article) {
                 return _ArticleListItem(
                   article: article,
-                  onTap: () => context.push('/article-detail', extra: article),
+                  onTap: () =>
+                      context.push('/home/article-detail', extra: article),
                 );
               }).toList(),
             );

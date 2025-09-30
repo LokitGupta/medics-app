@@ -218,8 +218,10 @@ class _ArticleListScreenState extends ConsumerState<ArticleListScreen> {
         itemBuilder: (context, index) {
           return _ArticleCard(
             article: filteredArticles[index],
-            onTap: () =>
-                context.push('/article-detail', extra: filteredArticles[index]),
+            onTap: () => context.push(
+              '/home/article-detail',
+              extra: filteredArticles[index],
+            ),
           );
         },
       ),
