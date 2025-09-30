@@ -40,10 +40,21 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // go back if possible
+            } else {
+              GoRouter.of(context).go('/home'); // fallback to home page
+            }
+          },
+        ),
         title: const Text('Book Appointment'),
         backgroundColor: AppConstants.primaryColor,
         foregroundColor: Colors.white,
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.paddingLarge),
         child: Column(
@@ -313,7 +324,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
         const SnackBar(content: Text('Appointment booked successfully!')),
       );
 
-      context.go('/appointments');
+      context.push('/appointments');
     } catch (e) {
       ScaffoldMessenger.of(
         context,

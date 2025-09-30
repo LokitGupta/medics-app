@@ -44,6 +44,7 @@ class _ArticleListScreenState extends ConsumerState<ArticleListScreen> {
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     final articlesAsync = ref.watch(articleProvider);
 
@@ -53,7 +54,18 @@ class _ArticleListScreenState extends ConsumerState<ArticleListScreen> {
         backgroundColor: AppConstants.primaryColor,
         foregroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // go back if possible
+            } else {
+              context.go('/home'); // fallback to home page
+            }
+          },
+        ),
       ),
+
       body: Column(
         children: [
           _buildSearchSection(),
@@ -207,7 +219,7 @@ class _ArticleListScreenState extends ConsumerState<ArticleListScreen> {
           return _ArticleCard(
             article: filteredArticles[index],
             onTap: () =>
-                context.go('/article-detail', extra: filteredArticles[index]),
+                context.push('/article-detail', extra: filteredArticles[index]),
           );
         },
       ),

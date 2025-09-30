@@ -46,7 +46,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 duration: Duration(seconds: 3),
               ),
             );
-            context.go('/login');
+            context.push('/login');
           }
         });
       }

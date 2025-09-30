@@ -43,64 +43,78 @@ final routerProvider = Provider<GoRouter>((ref) {
       return null;
     },
     routes: [
+      // Public routes
       GoRoute(
         path: '/onboarding',
-        builder: (context, state) => OnboardingScreen(),
+        builder: (context, state) => const OnboardingScreen(),
       ),
-      GoRoute(path: '/login', builder: (context, state) => LoginScreen()),
-      GoRoute(path: '/signup', builder: (context, state) => SignupScreen()),
+      GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(
+        path: '/signup',
+        builder: (context, state) => const SignupScreen(),
+      ),
       GoRoute(
         path: '/forgot-password',
-        builder: (context, state) => ForgotPasswordScreen(),
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
-      GoRoute(path: '/home', builder: (context, state) => HomeScreen()),
+
+      // Protected routes under Home (nested routes)
       GoRoute(
-        path: '/doctors',
-        builder: (context, state) => DoctorListScreen(),
-      ),
-      GoRoute(
-        path: '/doctor-detail',
-        builder: (context, state) {
-          final doctor = state.extra as Doctor;
-          return DoctorDetailScreen(doctor: doctor);
-        },
-      ),
-      GoRoute(
-        path: '/book-appointment',
-        builder: (context, state) {
-          final doctor = state.extra as Doctor;
-          return BookAppointmentScreen(doctor: doctor);
-        },
-      ),
-      GoRoute(
-        path: '/appointments',
-        builder: (context, state) => AppointmentListScreen(),
-      ),
-      GoRoute(
-        path: '/chat',
-        builder: (context, state) {
-          final params = state.extra as Map<String, dynamic>;
-          return ChatScreen(
-            doctorId: params['doctorId'],
-            doctorName: params['doctorName'],
-          );
-        },
-      ),
-      GoRoute(path: '/profile', builder: (context, state) => ProfileScreen()),
-      GoRoute(
-        path: '/edit-profile',
-        builder: (context, state) => EditProfileScreen(),
-      ),
-      GoRoute(
-        path: '/articles',
-        builder: (context, state) => ArticleListScreen(),
-      ),
-      GoRoute(
-        path: '/article-detail',
-        builder: (context, state) {
-          final article = state.extra as Article;
-          return ArticleDetailScreen(article: article);
-        },
+        path: '/home',
+        builder: (context, state) => const HomeScreen(),
+        routes: [
+          GoRoute(
+            path: 'doctors',
+            builder: (context, state) => const DoctorListScreen(),
+          ),
+          GoRoute(
+            path: 'doctor-detail',
+            builder: (context, state) {
+              final doctor = state.extra as Doctor;
+              return DoctorDetailScreen(doctor: doctor);
+            },
+          ),
+          GoRoute(
+            path: 'book-appointment',
+            builder: (context, state) {
+              final doctor = state.extra as Doctor;
+              return BookAppointmentScreen(doctor: doctor);
+            },
+          ),
+          GoRoute(
+            path: 'appointments',
+            builder: (context, state) => const AppointmentListScreen(),
+          ),
+          GoRoute(
+            path: 'chat',
+            builder: (context, state) {
+              final params = state.extra as Map<String, dynamic>;
+              return ChatScreen(
+                doctorId: params['doctorId'],
+                doctorName: params['doctorName'],
+              );
+            },
+          ),
+          GoRoute(
+            path: 'profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: 'edit-profile',
+            builder: (context, state) => const EditProfileScreen(),
+          ),
+          GoRoute(
+            path: 'articles',
+            builder: (context, state) => const ArticleListScreen(),
+          ),
+          GoRoute(
+            path: 'article-detail',
+            builder: (context, state) {
+              final article = state.extra as Article;
+              return ArticleDetailScreen(article: article);
+            },
+          ),
+        ],
       ),
     ],
   );

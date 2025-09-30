@@ -122,7 +122,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               width: double.infinity,
               height: 48,
               child: ElevatedButton(
-                onPressed: () => context.go('/login'),
+                onPressed: () => context.push('/login'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppConstants.primaryColor,
                   shape: RoundedRectangleBorder(
@@ -146,7 +146,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton(
-                  onPressed: () => context.go('/login'),
+                  onPressed: () => context.push('/login'),
                   child: const Text('Skip'),
                 ),
                 ElevatedButton(

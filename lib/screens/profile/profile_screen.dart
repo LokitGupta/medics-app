@@ -13,16 +13,27 @@ class ProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // go back if possible
+            } else {
+              GoRouter.of(context).go('/home'); // fallback to home page
+            }
+          },
+        ),
         title: const Text('Profile'),
         backgroundColor: AppConstants.primaryColor,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            onPressed: () => context.go('/edit-profile'),
+            onPressed: () => context.push('/edit-profile'),
             icon: const Icon(Icons.edit),
           ),
         ],
       ),
+
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -61,7 +72,7 @@ class ProfileScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            profile?.fullName ?? 'User Name',
+            profile?.name ?? 'User Name',
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
@@ -90,19 +101,19 @@ class ProfileScreen extends ConsumerWidget {
             icon: Icons.person,
             title: 'Edit Profile',
             subtitle: 'Update your personal information',
-            onTap: () => context.go('/edit-profile'),
+            onTap: () => context.push('/edit-profile'),
           ),
           _ProfileOption(
             icon: Icons.calendar_today,
             title: 'My Appointments',
             subtitle: 'View and manage your appointments',
-            onTap: () => context.go('/appointments'),
+            onTap: () => context.push('/appointments'),
           ),
           _ProfileOption(
             icon: Icons.article,
             title: 'Health Articles',
             subtitle: 'Read health tips and articles',
-            onTap: () => context.go('/articles'),
+            onTap: () => context.push('/articles'),
           ),
           _ProfileOption(
             icon: Icons.notifications,

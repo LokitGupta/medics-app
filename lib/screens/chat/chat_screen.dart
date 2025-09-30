@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/chat_provider.dart';
 import '../../core/constants.dart';
 import '../../models/message.dart';
+import 'package:go_router/go_router.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   final String doctorId;
@@ -61,6 +62,16 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // go back if possible
+            } else {
+              GoRouter.of(context).go('/home'); // fallback to home page
+            }
+          },
+        ),
         title: Row(
           children: [
             Container(

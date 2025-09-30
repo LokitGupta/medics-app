@@ -1,77 +1,86 @@
+// lib/models/user_profile.dart
+
 class UserProfile {
   final String id;
   final String email;
-  final String? fullName;
+  final String name;
   final String? phone;
-  final String? avatarUrl;
-  final DateTime? dateOfBirth;
-  final String? gender;
-  final String? address;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final String? profileImage;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
   UserProfile({
     required this.id,
     required this.email,
-    this.fullName,
+    required this.name,
     this.phone,
-    this.avatarUrl,
-    this.dateOfBirth,
-    this.gender,
-    this.address,
-    required this.createdAt,
-    required this.updatedAt,
+    this.profileImage,
+    this.createdAt,
+    this.updatedAt,
   });
 
+  // Create UserProfile from JSON (Supabase response)
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
-      id: json['id'],
-      email: json['email'],
-      fullName: json['full_name'],
-      phone: json['phone'],
-      avatarUrl: json['avatar_url'],
-      dateOfBirth: json['date_of_birth'] != null
-          ? DateTime.parse(json['date_of_birth'])
+      id: json['id'] as String,
+      email: json['email'] as String,
+      name: json['name'] as String,
+      phone: json['phone'] as String?,
+      profileImage: json['profile_image'] as String?,
+      createdAt: json['created_at'] != null
+          ? DateTime.parse(json['created_at'] as String)
           : null,
-      gender: json['gender'],
-      address: json['address'],
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
+      updatedAt: json['updated_at'] != null
+          ? DateTime.parse(json['updated_at'] as String)
+          : null,
     );
   }
 
+  // Convert UserProfile to JSON (for Supabase updates)
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'email': email,
-      'full_name': fullName,
+      'name': name,
       'phone': phone,
-      'avatar_url': avatarUrl,
-      'date_of_birth': dateOfBirth?.toIso8601String(),
-      'gender': gender,
-      'address': address,
+      'profile_image': profileImage,
+      'updated_at': DateTime.now().toIso8601String(),
     };
   }
 
+  // Create a copy with updated fields
   UserProfile copyWith({
-    String? fullName,
+    String? id,
+    String? email,
+    String? name,
     String? phone,
-    String? avatarUrl,
-    DateTime? dateOfBirth,
-    String? gender,
-    String? address,
+    String? profileImage,
+    DateTime? createdAt,
+    DateTime? updatedAt,
   }) {
     return UserProfile(
-      id: id,
-      email: email,
-      fullName: fullName ?? this.fullName,
+      id: id ?? this.id,
+      email: email ?? this.email,
+      name: name ?? this.name,
       phone: phone ?? this.phone,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
-      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
-      gender: gender ?? this.gender,
-      address: address ?? this.address,
-      createdAt: createdAt,
-      updatedAt: DateTime.now(),
+      profileImage: profileImage ?? this.profileImage,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
     );
   }
+
+  @override
+  String toString() {
+    return 'UserProfile(id: $id, email: $email, name: $name)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is UserProfile && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }

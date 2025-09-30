@@ -31,10 +31,21 @@ class _DoctorListScreenState extends ConsumerState<DoctorListScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // go back if possible
+            } else {
+              GoRouter.of(context).go('/home'); // fallback to home page
+            }
+          },
+        ),
         title: const Text('Find Doctors'),
         backgroundColor: AppConstants.primaryColor,
         foregroundColor: Colors.white,
       ),
+
       body: Column(
         children: [
           _buildSearchSection(),
@@ -130,7 +141,7 @@ class _DoctorListScreenState extends ConsumerState<DoctorListScreen> {
         return _DoctorCard(
           doctor: filteredDoctors[index],
           onTap: () =>
-              context.go('/doctor-detail', extra: filteredDoctors[index]),
+              context.push('/doctor-detail', extra: filteredDoctors[index]),
         );
       },
     );

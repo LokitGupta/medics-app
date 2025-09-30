@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter/services.dart';
 import '../../models/article.dart';
 import '../../core/constants.dart';
+import 'package:go_router/go_router.dart';
 
 class ArticleDetailScreen extends ConsumerWidget {
   final Article article;
+  final String? from; // source page for back navigation
 
-  const ArticleDetailScreen({super.key, required this.article});
+  const ArticleDetailScreen({super.key, required this.article, this.from});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,6 +34,18 @@ class ArticleDetailScreen extends ConsumerWidget {
       pinned: true,
       backgroundColor: AppConstants.primaryColor,
       foregroundColor: Colors.white,
+      leading: IconButton(
+        icon: const Icon(Icons.arrow_back),
+        onPressed: () {
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          } else if (from != null) {
+            context.go(from!); // go back to the source page
+          } else {
+            context.go('/home'); // fallback to home
+          }
+        },
+      ),
       flexibleSpace: FlexibleSpaceBar(
         background: Container(
           decoration: BoxDecoration(
@@ -73,7 +86,6 @@ class ArticleDetailScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Category Badge
           if (article.category != null)
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -94,10 +106,7 @@ class ArticleDetailScreen extends ConsumerWidget {
                 ),
               ),
             ),
-
           if (article.category != null) const SizedBox(height: 20),
-
-          // Title
           Text(
             article.title,
             style: const TextStyle(
@@ -107,99 +116,32 @@ class ArticleDetailScreen extends ConsumerWidget {
               color: Colors.black87,
             ),
           ),
-
           const SizedBox(height: 20),
-
-          // Author and Date Info
           _buildAuthorSection(),
-
           const SizedBox(height: 24),
-
-          // Summary (if available)
           if (article.summary != null) ...[
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-                border: Border.all(
-                  color: AppConstants.primaryColor.withOpacity(0.2),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
-                    children: [
-                      Icon(
-                        Icons.lightbulb_outline,
-                        color: AppConstants.primaryColor,
-                        size: 20,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Article Summary',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: AppConstants.primaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    article.summary!,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      height: 1.5,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            _buildSummarySection(),
             const SizedBox(height: 24),
           ],
-
-          // Reading Time Estimate
           _buildReadingTimeWidget(),
-
           const SizedBox(height: 24),
-
-          // Article Content
-          SizedBox(
-            width: double.infinity,
-            child: Text(
-              article.content,
-              style: const TextStyle(
-                fontSize: 16,
-                height: 1.7,
-                color: Colors.black87,
-                letterSpacing: 0.3,
-              ),
-              textAlign: TextAlign.justify,
+          Text(
+            article.content,
+            style: const TextStyle(
+              fontSize: 16,
+              height: 1.7,
+              color: Colors.black87,
+              letterSpacing: 0.3,
             ),
+            textAlign: TextAlign.justify,
           ),
-
           const SizedBox(height: 32),
-
-          // Tags Section (if we had tags)
           _buildTagsSection(),
-
           const SizedBox(height: 32),
-
-          // Medical Disclaimer
           _buildDisclaimerSection(),
-
           const SizedBox(height: 32),
-
-          // Action Buttons
           _buildActionButtons(context),
-
-          const SizedBox(height: 100), // Space for FAB
+          const SizedBox(height: 100),
         ],
       ),
     );
@@ -215,7 +157,6 @@ class ArticleDetailScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          // Author Avatar
           Container(
             width: 50,
             height: 50,
@@ -229,10 +170,7 @@ class ArticleDetailScreen extends ConsumerWidget {
               size: 24,
             ),
           ),
-
           const SizedBox(width: 16),
-
-          // Author Info
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -264,11 +202,54 @@ class ArticleDetailScreen extends ConsumerWidget {
     );
   }
 
+  Widget _buildSummarySection() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.blue.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+        border: Border.all(color: AppConstants.primaryColor.withOpacity(0.2)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(
+                Icons.lightbulb_outline,
+                color: AppConstants.primaryColor,
+                size: 20,
+              ),
+              SizedBox(width: 8),
+              Text(
+                'Article Summary',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: AppConstants.primaryColor,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            article.summary!,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+              height: 1.5,
+              color: Colors.black87,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildReadingTimeWidget() {
     final wordCount = article.content.split(' ').length;
-    final readingTimeMinutes = (wordCount / 200)
-        .ceil(); // Average reading speed
-
+    final readingTimeMinutes = (wordCount / 200).ceil();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
@@ -294,11 +275,8 @@ class ArticleDetailScreen extends ConsumerWidget {
   }
 
   Widget _buildTagsSection() {
-    // Generate some tags based on category and content
     final tags = _generateTags();
-
     if (tags.isEmpty) return const SizedBox.shrink();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -428,151 +406,33 @@ class ArticleDetailScreen extends ConsumerWidget {
 
   List<String> _generateTags() {
     final tags = <String>[];
-
-    // Add category as a tag
-    if (article.category != null) {
-      tags.add(article.category!);
-    }
-
-    // Generate tags based on content keywords (simple implementation)
-    final content = article.content.toLowerCase();
-    final commonMedicalTerms = [
-      'health',
-      'treatment',
-      'prevention',
-      'symptoms',
-      'diagnosis',
-      'exercise',
-      'nutrition',
-      'wellness',
-      'care',
-      'medicine',
-    ];
-
-    for (final term in commonMedicalTerms) {
-      if (content.contains(term) && tags.length < 6) {
-        tags.add(term.capitalize());
-      }
-    }
-
+    if (article.category != null) tags.add(article.category!);
     return tags;
+  }
+
+  void _shareArticle(BuildContext context) {
+    // implement share logic
+  }
+
+  void _toggleBookmark(BuildContext context) {
+    // implement bookmark logic
   }
 
   IconData _getCategoryIcon(String? category) {
     switch (category?.toLowerCase()) {
-      case 'cardiology':
-        return Icons.favorite;
-      case 'dermatology':
-        return Icons.face;
-      case 'pediatrics':
-        return Icons.child_care;
-      case 'orthopedics':
-        return Icons.accessibility;
-      case 'neurology':
-        return Icons.psychology;
-      case 'mental health':
-        return Icons.psychology_alt;
+      case 'health':
+        return Icons.health_and_safety;
+      case 'fitness':
+        return Icons.fitness_center;
       case 'nutrition':
         return Icons.restaurant;
-      case 'general health':
-        return Icons.health_and_safety;
       default:
         return Icons.article;
     }
   }
 
-  String _formatDate(DateTime date) {
-    final months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
-
-    final now = DateTime.now();
-    final difference = now.difference(date);
-
-    if (difference.inDays == 0) {
-      return 'today';
-    } else if (difference.inDays == 1) {
-      return 'yesterday';
-    } else if (difference.inDays < 7) {
-      return '${difference.inDays} days ago';
-    } else {
-      return 'on ${months[date.month - 1]} ${date.day}, ${date.year}';
-    }
-  }
-
-  void _shareArticle(BuildContext context) {
-    final shareText =
-        '''
-📱 Check out this health article from Medics App:
-
-${article.title}
-
-${article.summary ?? article.content.substring(0, 150)}...
-
-#HealthTips #MedicsApp #HealthCare
-    ''';
-
-    // Copy to clipboard (simple share implementation)
-    Clipboard.setData(ClipboardData(text: shareText));
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.white),
-            SizedBox(width: 8),
-            Text('Article link copied to clipboard!'),
-          ],
-        ),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
-  void _toggleBookmark(BuildContext context) {
-    // This would typically save to local storage or user preferences
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Row(
-          children: [
-            Icon(Icons.bookmark, color: Colors.white),
-            SizedBox(width: 8),
-            Text('Article saved to bookmarks!'),
-          ],
-        ),
-        backgroundColor: AppConstants.primaryColor,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        duration: const Duration(seconds: 2),
-        action: SnackBarAction(
-          label: 'VIEW',
-          textColor: Colors.white,
-          onPressed: () {
-            // Navigate to bookmarks screen
-          },
-        ),
-      ),
-    );
-  }
-}
-
-// Extension to capitalize first letter
-extension StringExtension on String {
-  String capitalize() {
-    return "${this[0].toUpperCase()}${substring(1)}";
+  String _formatDate(DateTime? date) {
+    if (date == null) return '';
+    return '${date.day}/${date.month}/${date.year}';
   }
 }

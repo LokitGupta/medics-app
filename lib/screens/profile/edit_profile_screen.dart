@@ -37,11 +37,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   void _loadCurrentProfile() {
     final profile = ref.read(authProvider).profile;
     if (profile != null) {
-      _fullNameController.text = profile.fullName ?? '';
+      _fullNameController.text = profile.name ?? '';
       _phoneController.text = profile.phone ?? '';
-      _addressController.text = profile.address ?? '';
-      _selectedGender = profile.gender;
-      _selectedDateOfBirth = profile.dateOfBirth;
     }
   }
 
@@ -59,6 +56,16 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // go back if possible
+            } else {
+              GoRouter.of(context).go('/profile'); // fallback to profile page
+            }
+          },
+        ),
         title: const Text('Edit Profile'),
         backgroundColor: AppConstants.primaryColor,
         foregroundColor: Colors.white,
@@ -76,6 +83,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           ),
         ],
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.paddingLarge),
         child: Form(
@@ -373,14 +381,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       }
 
       final updatedProfile = currentProfile.copyWith(
-        fullName: _fullNameController.text.trim(),
+        name: _fullNameController.text.trim(),
         phone: _phoneController.text.trim().isNotEmpty
             ? _phoneController.text.trim()
-            : null,
-        gender: _selectedGender,
-        dateOfBirth: _selectedDateOfBirth,
-        address: _addressController.text.trim().isNotEmpty
-            ? _addressController.text.trim()
             : null,
       );
 
@@ -395,7 +398,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               duration: Duration(seconds: 2),
             ),
           );
-          context.go('/profile');
+          context.push('/profile');
         }
       } catch (e) {
         if (mounted) {

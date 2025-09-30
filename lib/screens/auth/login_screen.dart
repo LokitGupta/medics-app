@@ -34,7 +34,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       if (next.user != null && previous?.user == null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
-            context.go('/home');
+            context.push('/home');
           }
         });
       }

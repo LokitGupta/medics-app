@@ -5,6 +5,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/appointment_provider.dart';
 import '../../core/constants.dart';
 import '../../models/appointment.dart';
+import 'package:go_router/go_router.dart';
 
 class AppointmentListScreen extends ConsumerStatefulWidget {
   const AppointmentListScreen({super.key});
@@ -44,6 +45,16 @@ class _AppointmentListScreenState extends ConsumerState<AppointmentListScreen>
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            if (Navigator.canPop(context)) {
+              Navigator.pop(context); // go back if possible
+            } else {
+              GoRouter.of(context).go('/home'); // fallback to home page
+            }
+          },
+        ),
         title: const Text('My Appointments'),
         backgroundColor: AppConstants.primaryColor,
         foregroundColor: Colors.white,
@@ -58,6 +69,7 @@ class _AppointmentListScreenState extends ConsumerState<AppointmentListScreen>
           ],
         ),
       ),
+
       body: appointmentsAsync.when(
         data: (appointments) => TabBarView(
           controller: _tabController,

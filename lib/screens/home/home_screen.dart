@@ -92,7 +92,7 @@ class _HomeTab extends ConsumerWidget {
   }
 
   Widget _buildHeader(AuthState authState) {
-    final userName = authState.profile?.fullName ?? 'User';
+    final userName = authState.profile?.name ?? 'User';
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -141,7 +141,7 @@ class _HomeTab extends ConsumerWidget {
               child: _QuickActionCard(
                 icon: Icons.search,
                 title: 'Find Doctor',
-                onTap: () => context.go('/doctors'),
+                onTap: () => context.push('/doctors'),
               ),
             ),
             const SizedBox(width: 16),
@@ -149,7 +149,7 @@ class _HomeTab extends ConsumerWidget {
               child: _QuickActionCard(
                 icon: Icons.calendar_today,
                 title: 'My Appointments',
-                onTap: () => context.go('/appointments'),
+                onTap: () => context.push('/appointments'),
               ),
             ),
           ],
@@ -161,7 +161,7 @@ class _HomeTab extends ConsumerWidget {
               child: _QuickActionCard(
                 icon: Icons.article,
                 title: 'Health Articles',
-                onTap: () => context.go('/articles'),
+                onTap: () => context.push('/articles'),
               ),
             ),
             const SizedBox(width: 16),
@@ -199,7 +199,7 @@ class _HomeTab extends ConsumerWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             TextButton(
-              onPressed: () => context.go('/doctors'),
+              onPressed: () => context.push('/doctors'),
               child: const Text('See All'),
             ),
           ],
@@ -216,8 +216,10 @@ class _HomeTab extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   return _DoctorCard(
                     doctor: topDoctors[index],
-                    onTap: () =>
-                        context.go('/doctor-detail', extra: topDoctors[index]),
+                    onTap: () => context.push(
+                      '/doctor-detail',
+                      extra: topDoctors[index],
+                    ),
                   );
                 },
               ),
@@ -245,7 +247,7 @@ class _HomeTab extends ConsumerWidget {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             TextButton(
-              onPressed: () => context.go('/articles'),
+              onPressed: () => context.push('/articles'),
               child: const Text('See All'),
             ),
           ],
@@ -258,7 +260,7 @@ class _HomeTab extends ConsumerWidget {
               children: recentArticles.map((article) {
                 return _ArticleListItem(
                   article: article,
-                  onTap: () => context.go('/article-detail', extra: article),
+                  onTap: () => context.push('/article-detail', extra: article),
                 );
               }).toList(),
             );
