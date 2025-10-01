@@ -324,7 +324,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
         const SnackBar(content: Text('Appointment booked successfully!')),
       );
 
-      context.push('/appointments');
+      context.push('/home/appointments');
     } catch (e) {
       ScaffoldMessenger.of(
         context,

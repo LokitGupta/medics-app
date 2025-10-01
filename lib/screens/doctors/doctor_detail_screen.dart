@@ -216,7 +216,8 @@ class DoctorDetailScreen extends ConsumerWidget {
             width: double.infinity,
             height: 48,
             child: ElevatedButton(
-              onPressed: () => context.push('/book-appointment', extra: doctor),
+              onPressed: () =>
+                  context.push('/home/book-appointment', extra: doctor),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppConstants.primaryColor,
                 shape: RoundedRectangleBorder(
@@ -279,7 +280,7 @@ class DoctorDetailScreen extends ConsumerWidget {
           .getOrCreateChatRoom(authState.user!.id, doctor.id);
 
       context.push(
-        '/chat',
+        '/home/chat',
         extra: {'doctorId': doctor.id, 'doctorName': doctor.fullName},
       );
     } catch (e) {
