@@ -140,8 +140,10 @@ class _DoctorListScreenState extends ConsumerState<DoctorListScreen> {
       itemBuilder: (context, index) {
         return _DoctorCard(
           doctor: filteredDoctors[index],
-          onTap: () =>
-              context.push('/doctor-detail', extra: filteredDoctors[index]),
+          onTap: () => context.push(
+            '/home/doctor-detail',
+            extra: filteredDoctors[index],
+          ),
         );
       },
     );
