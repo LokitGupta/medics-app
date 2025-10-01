@@ -150,26 +150,14 @@ class _ArticleListScreenState extends ConsumerState<ArticleListScreen> {
                 return Container(
                   margin: const EdgeInsets.only(right: 8),
                   child: FilterChip(
-                    label: Text(
-                      category,
-                      style: TextStyle(
-                        color: isSelected
-                            ? Colors.white
-                            : AppConstants.primaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                    label: Text(category),
                     selected: isSelected,
                     onSelected: (selected) {
                       setState(() {
                         _selectedCategory = category == 'All' ? null : category;
                       });
                     },
-                    selectedColor: Colors.white.withOpacity(0.2),
-                    backgroundColor: Colors.white,
-                    side: BorderSide(
-                      color: isSelected ? Colors.white : Colors.transparent,
-                    ),
+                    selectedColor: AppConstants.primaryColor.withOpacity(0.2),
                   ),
                 );
               },
