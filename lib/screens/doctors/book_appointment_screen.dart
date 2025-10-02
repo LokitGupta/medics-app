@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../models/doctor.dart';
+import '../../models/appointment.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/appointment_provider.dart';
 import '../../core/constants.dart';
@@ -44,9 +45,9 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
             if (Navigator.canPop(context)) {
-              Navigator.pop(context); // go back if possible
+              Navigator.pop(context);
             } else {
-              GoRouter.of(context).go('/home'); // fallback to home page
+              GoRouter.of(context).go('/home');
             }
           },
         ),
@@ -54,7 +55,6 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
         backgroundColor: AppConstants.primaryColor,
         foregroundColor: Colors.white,
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(AppConstants.paddingLarge),
         child: Column(
@@ -114,9 +114,9 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
                 if (widget.doctor.consultationFee != null)
-                  const Text(
-                    '\${widget.doctor.consultationFee!.toStringAsFixed(0)} consultation fee',
-                    style: TextStyle(
+                  Text(
+                    '${widget.doctor.consultationFee!.toStringAsFixed(0)} consultation fee',
+                    style: const TextStyle(
                       fontSize: 14,
                       color: AppConstants.primaryColor,
                       fontWeight: FontWeight.w500,
@@ -171,7 +171,67 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
     );
   }
 
+  void _selectDate() async {
+    final now = DateTime.now();
+
+    // Find the first available date starting from today
+    DateTime firstAvailable = now;
+    while (!widget.doctor.availableDays.contains(
+      DateFormat('EEEE').format(firstAvailable),
+    )) {
+      firstAvailable = firstAvailable.add(const Duration(days: 1));
+    }
+
+    final lastDate = now.add(const Duration(days: 90));
+
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? firstAvailable,
+      firstDate: firstAvailable,
+      lastDate: lastDate,
+      selectableDayPredicate: (DateTime day) {
+        final dayName = DateFormat('EEEE').format(day);
+        return widget.doctor.availableDays.contains(dayName);
+      },
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        _selectedDate = pickedDate;
+        _selectedTime = null; // reset selected time
+      });
+    }
+  }
+
   Widget _buildTimeSelection() {
+    final appointmentsAsync = ref.watch(appointmentProvider);
+
+    // booked times for selected doctor & date
+    final bookedTimes = <String>[];
+    final appointments = appointmentsAsync.asData?.value ?? [];
+
+    if (_selectedDate != null) {
+      for (final a in appointments) {
+        final doctorId = a.doctorId;
+        final status = a.status;
+        final appointmentTime = a.appointmentTime;
+        final appointmentDate = a.appointmentDate;
+
+        if (doctorId != null &&
+            doctorId == widget.doctor.id &&
+            status != null &&
+            status == 'scheduled' &&
+            appointmentDate != null &&
+            DateFormat('yyyy-MM-dd').format(appointmentDate) ==
+                DateFormat('yyyy-MM-dd').format(_selectedDate!) &&
+            appointmentTime != null) {
+          bookedTimes.add(appointmentTime);
+        }
+      }
+    }
+
+    final now = DateTime.now();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -192,21 +252,44 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
           itemCount: _availableTimes.length,
           itemBuilder: (context, index) {
             final time = _availableTimes[index];
+
+            // Check if time is in the past
+            bool isPastTime = false;
+            if (_selectedDate != null) {
+              final selectedDateTime = DateTime(
+                _selectedDate!.year,
+                _selectedDate!.month,
+                _selectedDate!.day,
+                int.parse(time.split(':')[0]),
+                int.parse(time.split(':')[1]),
+              );
+              isPastTime = selectedDateTime.isBefore(now);
+            }
+
+            // Check if time is already booked
+            final isBooked = bookedTimes.contains(time);
+            final isDisabled = isPastTime || isBooked;
             final isSelected = _selectedTime == time;
 
             return InkWell(
-              onTap: () {
-                setState(() {
-                  _selectedTime = time;
-                });
-              },
+              onTap: isDisabled
+                  ? null
+                  : () {
+                      setState(() {
+                        _selectedTime = time;
+                      });
+                    },
               child: Container(
                 decoration: BoxDecoration(
-                  color: isSelected ? AppConstants.primaryColor : Colors.white,
+                  color: isDisabled
+                      ? Colors.grey[300]
+                      : (isSelected ? AppConstants.primaryColor : Colors.white),
                   border: Border.all(
-                    color: isSelected
-                        ? AppConstants.primaryColor
-                        : Colors.grey[300]!,
+                    color: isDisabled
+                        ? Colors.grey
+                        : (isSelected
+                              ? AppConstants.primaryColor
+                              : Colors.grey[300]!),
                   ),
                   borderRadius: BorderRadius.circular(AppConstants.radiusSmall),
                 ),
@@ -214,7 +297,9 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
                   child: Text(
                     time,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.black,
+                      color: isDisabled
+                          ? Colors.grey[600]
+                          : (isSelected ? Colors.white : Colors.black),
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -282,25 +367,6 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
               ),
       ),
     );
-  }
-
-  void _selectDate() async {
-    final now = DateTime.now();
-    final firstDate = now;
-    final lastDate = now.add(const Duration(days: 90));
-
-    final pickedDate = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? firstDate,
-      firstDate: firstDate,
-      lastDate: lastDate,
-    );
-
-    if (pickedDate != null) {
-      setState(() {
-        _selectedDate = pickedDate;
-      });
-    }
   }
 
   void _bookAppointment() async {
