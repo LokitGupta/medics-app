@@ -21,6 +21,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
   DateTime? _selectedDate;
   String? _selectedTime;
   final _notesController = TextEditingController();
+  bool _isBooking = false;
 
   final List<String> _availableTimes = [
     '09:00',
@@ -206,7 +207,6 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
   Widget _buildTimeSelection() {
     final appointmentsAsync = ref.watch(appointmentProvider);
 
-    // booked times for selected doctor & date
     final bookedTimes = <String>[];
     final appointments = appointmentsAsync.asData?.value ?? [];
 
@@ -253,7 +253,6 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
           itemBuilder: (context, index) {
             final time = _availableTimes[index];
 
-            // Check if time is in the past
             bool isPastTime = false;
             if (_selectedDate != null) {
               final selectedDateTime = DateTime(
@@ -266,7 +265,6 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
               isPastTime = selectedDateTime.isBefore(now);
             }
 
-            // Check if time is already booked
             final isBooked = bookedTimes.contains(time);
             final isDisabled = isPastTime || isBooked;
             final isSelected = _selectedTime == time;
@@ -337,7 +335,6 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
 
   Widget _buildBookButton() {
     final authState = ref.watch(authProvider);
-    final appointmentsAsync = ref.watch(appointmentProvider);
 
     return SizedBox(
       width: double.infinity,
@@ -346,8 +343,9 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
         onPressed:
             (_selectedDate != null &&
                 _selectedTime != null &&
-                authState.user != null)
-            ? () => _bookAppointment()
+                authState.user != null &&
+                !_isBooking)
+            ? _bookAppointment
             : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppConstants.primaryColor,
@@ -355,7 +353,7 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
             borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
           ),
         ),
-        child: appointmentsAsync.isLoading
+        child: _isBooking
             ? const CircularProgressIndicator(color: Colors.white)
             : const Text(
                 'Book Appointment',
@@ -372,6 +370,8 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
   void _bookAppointment() async {
     final authState = ref.read(authProvider);
     if (authState.user == null) return;
+
+    setState(() => _isBooking = true);
 
     try {
       await ref
@@ -395,6 +395,8 @@ class _BookAppointmentScreenState extends ConsumerState<BookAppointmentScreen> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error booking appointment: $e')));
+    } finally {
+      setState(() => _isBooking = false);
     }
   }
 }
