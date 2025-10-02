@@ -28,7 +28,7 @@ class ProfileScreen extends ConsumerWidget {
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            onPressed: () => context.push('/edit-profile'),
+            onPressed: () => context.push('/home/edit-profile'),
             icon: const Icon(Icons.edit),
           ),
         ],
@@ -101,19 +101,19 @@ class ProfileScreen extends ConsumerWidget {
             icon: Icons.person,
             title: 'Edit Profile',
             subtitle: 'Update your personal information',
-            onTap: () => context.push('/edit-profile'),
+            onTap: () => context.push('/home/edit-profile'),
           ),
           _ProfileOption(
             icon: Icons.calendar_today,
             title: 'My Appointments',
             subtitle: 'View and manage your appointments',
-            onTap: () => context.push('/appointments'),
+            onTap: () => context.push('/home/appointments'),
           ),
           _ProfileOption(
             icon: Icons.article,
             title: 'Health Articles',
             subtitle: 'Read health tips and articles',
-            onTap: () => context.push('/articles'),
+            onTap: () => context.push('/home/articles'),
           ),
           _ProfileOption(
             icon: Icons.notifications,

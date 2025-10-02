@@ -71,23 +71,51 @@ class _AppointmentListScreenState extends ConsumerState<AppointmentListScreen>
       ),
 
       body: appointmentsAsync.when(
-        data: (appointments) => TabBarView(
-          controller: _tabController,
-          children: [
-            _buildAppointmentList(
-              appointments.where((a) => a.status == 'scheduled').toList(),
-              'upcoming',
-            ),
-            _buildAppointmentList(
-              appointments.where((a) => a.status == 'completed').toList(),
-              'completed',
-            ),
-            _buildAppointmentList(
-              appointments.where((a) => a.status == 'cancelled').toList(),
-              'cancelled',
-            ),
-          ],
-        ),
+        data: (appointments) {
+          final now = DateTime.now();
+
+          // Filter upcoming appointments
+          final upcomingAppointments = appointments.where((a) {
+            if (a.status != 'scheduled') return false;
+            final appointmentDateTime = DateTime(
+              a.appointmentDate.year,
+              a.appointmentDate.month,
+              a.appointmentDate.day,
+              int.parse(a.appointmentTime.split(':')[0]),
+              int.parse(a.appointmentTime.split(':')[1]),
+            );
+            return appointmentDateTime.isAfter(now) ||
+                appointmentDateTime.isAtSameMomentAs(now);
+          }).toList();
+
+          // Filter completed appointments (scheduled but time passed OR already completed)
+          final completedAppointments = appointments.where((a) {
+            if (a.status == 'completed') return true;
+            if (a.status != 'scheduled') return false;
+            final appointmentDateTime = DateTime(
+              a.appointmentDate.year,
+              a.appointmentDate.month,
+              a.appointmentDate.day,
+              int.parse(a.appointmentTime.split(':')[0]),
+              int.parse(a.appointmentTime.split(':')[1]),
+            );
+            return appointmentDateTime.isBefore(now);
+          }).toList();
+
+          // Filter cancelled appointments
+          final cancelledAppointments = appointments
+              .where((a) => a.status == 'cancelled')
+              .toList();
+
+          return TabBarView(
+            controller: _tabController,
+            children: [
+              _buildAppointmentList(upcomingAppointments, 'upcoming'),
+              _buildAppointmentList(completedAppointments, 'completed'),
+              _buildAppointmentList(cancelledAppointments, 'cancelled'),
+            ],
+          );
+        },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stack) => Center(child: Text('Error: $error')),
       ),

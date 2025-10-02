@@ -8,6 +8,11 @@ import '../../core/constants.dart';
 import '../../models/doctor.dart';
 import '../../models/article.dart';
 
+// Import the actual screens
+import '../../screens/doctors/doctor_list_screen.dart';
+import '../../screens/appointments/appointment_list_screen.dart';
+import '../profile/profile_screen.dart';
+
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -35,9 +40,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         index: _selectedIndex,
         children: [
           _HomeTab(),
-          _DoctorsTab(),
-          _AppointmentsTab(),
-          _ProfileTab(),
+          const DoctorListScreen(),
+          const AppointmentListScreen(),
+          const ProfileScreen(),
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
@@ -476,26 +481,5 @@ class _ArticleListItem extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _DoctorsTab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Doctors Tab - Will be implemented'));
-  }
-}
-
-class _AppointmentsTab extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return const Center(child: Text('Appointments Tab - Will be implemented'));
-  }
-}
-
-class _ProfileTab extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return const Center(child: Text('Profile Tab - Will be implemented'));
   }
 }
